@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - '*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -37,7 +42,7 @@ jobs:
       run: |
         cd buildroot
         make BR2_EXTERNAL=../cocos/hal/linux cocos_defconfig
-        make
+        make -j4
 
     - name: Create Release
       id: create_release
