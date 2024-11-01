@@ -22,6 +22,7 @@ import (
 	authmocks "github.com/ultravioletrs/cocos/agent/mocks"
 	"github.com/ultravioletrs/cocos/agent/quoteprovider/mocks"
 	"github.com/ultravioletrs/cocos/internal/server"
+	grpcClient "github.com/ultravioletrs/cocos/pkg/clients/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 )
@@ -38,9 +39,10 @@ func TestNew(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	config := server.Config{
-		Host: "localhost",
-		Port: "50051",
+	config := server.AgentConfig{
+		BaseConfig: grpcClient.BaseConfig{
+			URL: "localhost:50051",
+		},
 	}
 	logger := slog.Default()
 	qp := new(mocks.QuoteProvider)
@@ -55,9 +57,10 @@ func TestNew(t *testing.T) {
 func TestServerStart(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	config := server.Config{
-		Host: "localhost",
-		Port: "0",
+	config := server.AgentConfig{
+		BaseConfig: grpcClient.BaseConfig{
+			URL: "localhost:0",
+		},
 	}
 	buf := &ThreadSafeBuffer{}
 	logger := slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))
@@ -90,9 +93,10 @@ func TestServerStartWithTLS(t *testing.T) {
 	cert, key, err := generateSelfSignedCert()
 	assert.NoError(t, err)
 
-	config := server.Config{
-		Host:     "localhost",
-		Port:     "0",
+	config := server.AgentConfig{
+		BaseConfig: grpcClient.BaseConfig{
+			URL: "localhost:0",
+		},
 		CertFile: string(cert),
 		KeyFile:  string(key),
 	}
@@ -129,9 +133,10 @@ func TestServerStartWithTLS(t *testing.T) {
 func TestServerStartWithAttestedTLS(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	config := server.Config{
-		Host:        "localhost",
-		Port:        "0",
+	config := server.AgentConfig{
+		BaseConfig: grpcClient.BaseConfig{
+			URL: "localhost:0",
+		},
 		AttestedTLS: true,
 	}
 
@@ -169,9 +174,10 @@ func TestServerStartWithAttestedTLS(t *testing.T) {
 func TestServerStop(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	config := server.Config{
-		Host: "localhost",
-		Port: "0",
+	config := server.AgentConfig{
+		BaseConfig: grpcClient.BaseConfig{
+			URL: "localhost:0",
+		},
 	}
 	buf := &ThreadSafeBuffer{}
 	logger := slog.New(slog.NewTextHandler(buf, &slog.HandlerOptions{Level: slog.LevelDebug}))

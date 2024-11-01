@@ -63,14 +63,19 @@ var (
 	maxTryDelay              = time.Second * 30
 )
 
-type Config struct {
-	ClientCert   string        `env:"CLIENT_CERT"     envDefault:""`
-	ClientKey    string        `env:"CLIENT_KEY"      envDefault:""`
-	ServerCAFile string        `env:"SERVER_CA_CERTS" envDefault:""`
-	URL          string        `env:"URL"             envDefault:"localhost:7001"`
-	Timeout      time.Duration `env:"TIMEOUT"         envDefault:"60s"`
-	AttestedTLS  bool          `env:"ATTESTED_TLS"    envDefault:"false"`
-	BackendInfo  string        `env:"BACKEND_INFO"    envDefault:""`
+type BaseConfig struct {
+	URL     string        `env:"URL"             envDefault:"localhost:7001"`
+	Timeout time.Duration `env:"TIMEOUT"         envDefault:"60s"`
+}
+
+type ManagerConfig struct {
+	BaseConfig
+	ClientCert   string `env:"CLIENT_CERT"     envDefault:""`
+	ClientKey    string `env:"CLIENT_KEY"      envDefault:""`
+	ServerCAFile string `env:"SERVER_CA_CERTS" envDefault:""`
+	BackendInfo  string `env:"BACKEND_INFO"    envDefault:""`
+	ClientTLS  bool   `env:"CLIENT_TLS"    envDefault:"false"`
+
 }
 
 type AttestationConfiguration struct {
@@ -91,13 +96,13 @@ type Client interface {
 
 type client struct {
 	*grpc.ClientConn
-	cfg    Config
+	cfg    ManagerConfig
 	secure security
 }
 
 var _ Client = (*client)(nil)
 
-func NewClient(cfg Config) (Client, error) {
+func NewClient(cfg ManagerConfig) (Client, error) {
 	conn, secure, err := connect(cfg)
 	if err != nil {
 		return nil, err
@@ -136,14 +141,14 @@ func (c *client) Connection() *grpc.ClientConn {
 }
 
 // connect creates new gRPC client and connect to gRPC server.
-func connect(cfg Config) (*grpc.ClientConn, security, error) {
+func connect(cfg ManagerConfig) (*grpc.ClientConn, security, error) {
 	opts := []grpc.DialOption{
 		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
 	}
 	secure := withoutTLS
 	tc := insecure.NewCredentials()
 
-	if cfg.AttestedTLS {
+	if cfg.ClientTLS {
 		err := ReadBackendInfo(cfg.BackendInfo, &attestationConfiguration)
 		if err != nil {
 			return nil, secure, errors.Wrap(fmt.Errorf("failed to read Backend Info"), err)

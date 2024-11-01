@@ -91,7 +91,7 @@ func main() {
 	args := qemuCfg.ConstructQemuArgs()
 	logger.Info(strings.Join(args, " "))
 
-	managerGRPCConfig := grpc.Config{}
+	managerGRPCConfig := grpc.ManagerConfig{}
 	if err := env.ParseWithOptions(&managerGRPCConfig, env.Options{Prefix: envPrefixGRPC}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load %s gRPC client configuration : %s", svcName, err))
 		exitCode = 1

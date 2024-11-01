@@ -94,7 +94,7 @@ func main() {
 		return
 	}
 
-	agentGRPCConfig := grpc.Config{}
+	agentGRPCConfig := grpc.ManagerConfig{}
 	if err := env.ParseWithOptions(&agentGRPCConfig, env.Options{Prefix: envPrefixAgentGRPC}); err != nil {
 		message := color.New(color.FgRed).Sprintf("failed to load %s gRPC client configuration : %s", svcName, err)
 		rootCmd.Println(message)

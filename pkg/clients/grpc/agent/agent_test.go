@@ -102,9 +102,11 @@ func TestAgentClientIntegration(t *testing.T) {
 				testServer.health.SetServingStatus("agent", grpchealth.HealthCheckResponse_SERVING)
 			}
 
-			cfg := pkggrpc.Config{
-				URL:     testServer.listenAddr,
-				Timeout: 1,
+			cfg := pkggrpc.ManagerConfig{
+				BaseConfig: pkggrpc.BaseConfig{
+					URL:     testServer.listenAddr,
+					Timeout: 1,
+				},
 			}
 
 			if !tt.serverRunning {
