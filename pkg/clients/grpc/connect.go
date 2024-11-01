@@ -73,8 +73,9 @@ type ManagerConfig struct {
 	ClientCert   string `env:"CLIENT_CERT"     envDefault:""`
 	ClientKey    string `env:"CLIENT_KEY"      envDefault:""`
 	ServerCAFile string `env:"SERVER_CA_CERTS" envDefault:""`
-	AttestedTLS  bool   `env:"ATTESTED_TLS"    envDefault:"false"`
 	BackendInfo  string `env:"BACKEND_INFO"    envDefault:""`
+	ClientTLS  bool   `env:"CLIENT_TLS"    envDefault:"false"`
+
 }
 
 type AttestationConfiguration struct {
@@ -147,7 +148,7 @@ func connect(cfg ManagerConfig) (*grpc.ClientConn, security, error) {
 	secure := withoutTLS
 	tc := insecure.NewCredentials()
 
-	if cfg.AttestedTLS {
+	if cfg.ClientTLS {
 		err := ReadBackendInfo(cfg.BackendInfo, &attestationConfiguration)
 		if err != nil {
 			return nil, secure, errors.Wrap(fmt.Errorf("failed to read Backend Info"), err)
