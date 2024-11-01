@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Package",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${fileDirname}",
+      "env": {
+        "MANAGER_QEMU_USE_SUDO": "true",
+        "MANAGER_QEMU_SMP_MAXCPUS": "4",
+        "MANAGER_GRPC_URL": "localhost:7001",
+        "MANAGER_LOG_LEVEL": "debug",
+        "MANAGER_QEMU_ENABLE_SEV_SNP": "false",
+        "MANAGER_QEMU_OVMF_CODE_FILE": "/usr/share/edk2/ovmf/OVMF_CODE.fd",
+        "MANAGER_QEMU_OVMF_VARS_FILE": "/usr/share/edk2/ovmf/OVMF_VARS.fd"
+      }
+    }
+  ]
+}
