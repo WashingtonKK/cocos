@@ -60,8 +60,8 @@ type serviceRegister func(srv *grpc.Server)
 
 var _ server.Server = (*Server)(nil)
 
-func New(ctx context.Context, cancel context.CancelFunc, name string, config server.Config, registerService serviceRegister, logger *slog.Logger, qp client.QuoteProvider, authSvc auth.Authenticator) server.Server {
-	listenFullAddress := fmt.Sprintf("%s:%s", config.Host, config.Port)
+func New(ctx context.Context, cancel context.CancelFunc, name string, config server.AgentConfig, registerService serviceRegister, logger *slog.Logger, qp client.QuoteProvider, authSvc auth.Authenticator) server.Server {
+	listenFullAddress := config.URL
 	return &Server{
 		BaseServer: server.BaseServer{
 			Ctx:     ctx,

@@ -13,19 +13,21 @@ import (
 func TestNewManagerClient(t *testing.T) {
 	tests := []struct {
 		name string
-		cfg  grpc.Config
+		cfg  grpc.ManagerConfig
 		err  error
 	}{
 		{
 			name: "Valid config",
-			cfg: grpc.Config{
-				URL: "localhost:7001",
+			cfg: grpc.ManagerConfig{
+				BaseConfig: grpc.BaseConfig{
+					URL: "localhost:7001",
+				},
 			},
 			err: nil,
 		},
 		{
 			name: "invalid config, missing BackendInfo with aTLS",
-			cfg:  grpc.Config{AttestedTLS: true},
+			cfg:  grpc.ManagerConfig{AttestedTLS: true},
 			err:  grpc.ErrBackendInfoMissing,
 		},
 	}

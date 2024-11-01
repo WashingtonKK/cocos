@@ -31,6 +31,7 @@ import (
 	ackvsock "github.com/ultravioletrs/cocos/internal/vsock"
 	managerevents "github.com/ultravioletrs/cocos/manager/events"
 	"github.com/ultravioletrs/cocos/manager/qemu"
+	grpcClient "github.com/ultravioletrs/cocos/pkg/clients/grpc"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
@@ -97,9 +98,10 @@ func main() {
 
 	svc := newService(ctx, logger, eventSvc, cfg, qp)
 
-	grpcServerConfig := server.Config{
-		Port:         cfg.AgentConfig.Port,
-		Host:         cfg.AgentConfig.Host,
+	grpcServerConfig := server.AgentConfig{
+		BaseConfig: grpcClient.BaseConfig{
+			URL: fmt.Sprintf("%s:%s", cfg.AgentConfig.Host, cfg.AgentConfig.Port),
+		},
 		CertFile:     cfg.AgentConfig.CertFile,
 		KeyFile:      cfg.AgentConfig.KeyFile,
 		ServerCAFile: cfg.AgentConfig.ServerCAFile,

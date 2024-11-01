@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/ultravioletrs/cocos/pkg/clients/grpc"
 )
 
 //go:generate mockery --name Server --output ./mocks --filename server.go
@@ -17,9 +19,8 @@ type Server interface {
 	Stop() error
 }
 
-type Config struct {
-	Host         string `env:"HOST"               envDefault:""`
-	Port         string `env:"PORT"               envDefault:""`
+type AgentConfig struct {
+	grpc.BaseConfig
 	CertFile     string `env:"SERVER_CERT"        envDefault:""`
 	KeyFile      string `env:"SERVER_KEY"         envDefault:""`
 	ServerCAFile string `env:"SERVER_CA_CERTS"    envDefault:""`
@@ -32,7 +33,7 @@ type BaseServer struct {
 	Cancel   context.CancelFunc
 	Name     string
 	Address  string
-	Config   Config
+	Config   AgentConfig
 	Logger   *slog.Logger
 	Protocol string
 }

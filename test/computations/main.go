@@ -18,6 +18,7 @@ import (
 	grpcserver "github.com/ultravioletrs/cocos/internal/server/grpc"
 	"github.com/ultravioletrs/cocos/manager"
 	managergrpc "github.com/ultravioletrs/cocos/manager/api/grpc"
+	grpcClient "github.com/ultravioletrs/cocos/pkg/clients/grpc"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -140,7 +141,11 @@ func main() {
 		reflection.Register(srv)
 		manager.RegisterManagerServiceServer(srv, managergrpc.NewServer(incomingChan, &svc{logger: logger}))
 	}
-	grpcServerConfig := server.Config{Port: defaultPort}
+	grpcServerConfig := server.AgentConfig{
+		BaseConfig: grpcClient.BaseConfig{
+			URL: fmt.Sprintf("localhost:%s", defaultPort),
+		},
+	}
 	if err := env.ParseWithOptions(&grpcServerConfig, env.Options{}); err != nil {
 		logger.Error(fmt.Sprintf("failed to load %s gRPC client configuration : %s", svcName, err))
 		return
