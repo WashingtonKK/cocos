@@ -1,28 +1,24 @@
 {
-  "policy": {
-    "policy": 196608,
-    "family_id": "AAAAAAAAAAAAAAAAAAAAAA==",
-    "image_id": "AAAAAAAAAAAAAAAAAAAAAA==",
-    "vmpl": 0,
-    "minimum_tcb": 15352208179752599555,
-    "minimum_launch_tcb": 15352208179752599555,
-    "require_author_key": false,
-    "measurement": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-    "host_data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-    "report_id_ma": "//////////////////////////////////////////8=",
-    "chip_id": "GrFqtQ+lrkLsjBslu9pcC6XqkrtFWY1ArIQ+I4gugQIsvCG0qekSvEtE4P/SLSJ6mHNpOkY0MHnGpvz1OkV+kw==",
-    "minimum_build": 8,
-    "minimum_version": "1.55",
-    "permit_provisional_firmware": true,
-    "require_id_block": false,
-    "product": {
-      "name": 1
-    }
-  },
-  "root_of_trust": {
+  "rootOfTrust": {
     "product": "Milan",
-    "check_crl": true,
-    "disallow_network": false,
-    "product_line": "Milan"
+    "checkCrl": true,
+    "productLine": "Milan"
+  },
+  "policy": {
+    "policy": "196608",
+    "familyId": "AAAAAAAAAAAAAAAAAAAAAA==",
+    "imageId": "AAAAAAAAAAAAAAAAAAAAAA==",
+    "vmpl": 0,
+    "minimumTcb": "15352208179752599555",
+    "minimumLaunchTcb": "15352208179752599555",
+    "measurement": "SVBMz9a1ab0qw19b3iExOPlgUdCYRgb6oKRDbQT+Cu4Rp5ICobKhVYusJ6zic8Mk",
+    "hostData": "WPHP6SqBVCFJEvOT+Fl0MvbV6tWeSSFAfSNW71lMYJ4=",
+    "reportIdMa": "//////////////////////////////////////////8=",
+    "chipId": "GrFqtQ+lrkLsjBslu9pcC6XqkrtFWY1ArIQ+I4gugQIsvCG0qekSvEtE4P/SLSJ6mHNpOkY0MHnGpvz1OkV+kw==",
+    "minimumBuild": 8,
+    "minimumVersion": "1.55",
+    "product": {
+      "name": "SEV_PRODUCT_MILAN"
+    }
   }
 }

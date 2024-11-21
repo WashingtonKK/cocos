@@ -9,13 +9,21 @@
       "program": "${fileDirname}",
       "env": {
         "MANAGER_QEMU_USE_SUDO": "true",
-        "MANAGER_QEMU_SMP_MAXCPUS": "4",
-        "MANAGER_GRPC_URL": "localhost:7001",
+        "MANAGER_QEMU_SMP_MAXCPUS": "12",
+        "MANAGER_GRPC_URL": "localhost:7011",
         "MANAGER_LOG_LEVEL": "debug",
         "MANAGER_QEMU_ENABLE_SEV_SNP": "false",
         "MANAGER_QEMU_OVMF_CODE_FILE": "/usr/share/edk2/ovmf/OVMF_CODE.fd",
-        "MANAGER_QEMU_OVMF_VARS_FILE": "/usr/share/edk2/ovmf/OVMF_VARS.fd"
+        "MANAGER_QEMU_OVMF_VARS_FILE": "/usr/share/edk2/ovmf/OVMF_VARS.fd",
+        "MANAGER_GRPC_CLIENT_CERT": "/home/wkk/Documents/work/cocos/cmd/manager/cert.pem",
+        "MANAGER_GRPC_CLIENT_KEY":"/home/wkk/Documents/work/cocos/cmd/manager/key.pem",
+        "MANAGER_GRPC_SERVER_CA_CERTS":"/home/wkk/Documents/work/cocos/cmd/manager/ca.pem"
       }
     }
+  ],
+  "args": [
+    "-tags",
+    "embed",
+    "main.go"
   ]
 }
