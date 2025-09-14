@@ -251,9 +251,9 @@ func GetCertificate(caUrl string, cvmId string) func(*tls.ClientHelloInfo) (*tls
 
 			url := fmt.Sprintf("%s/%s?%s", caUrl, endpoint, query_string)
 
-			_, body, err := processRequest(http.MethodPost, url, data, nil, http.StatusOK)
-			if err != nil {
-				return nil, fmt.Errorf("failed to process request: %w", err)
+			_, body, sdkErr := processRequest(http.MethodPost, url, data, nil, http.StatusOK)
+			if sdkErr != nil {
+				return nil, fmt.Errorf("failed to process request: %w", sdkErr)
 			}
 
 			var cert certssdk.Certificate
