@@ -15,6 +15,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	certsSDK "github.com/absmach/certs/sdk"
 	mglog "github.com/absmach/supermq/logger"
 	"github.com/absmach/supermq/pkg/prometheus"
 	"github.com/caarlos0/env/v11"
@@ -152,6 +153,13 @@ func main() {
 		return
 	}
 
+	ctrsdkconfig := certsSDK.Config{
+		CertsURL: cfg.CAUrl,
+		HostURL:  cfg.CAUrl,
+	}
+
+	crtSDK := certsSDK.NewSDK(ctrsdkconfig)
+
 	svc := newService(ctx, logger, eventSvc, provider, cfg.Vmpl)
 
 	if err := os.MkdirAll(storageDir, 0o755); err != nil {
@@ -160,7 +168,7 @@ func main() {
 		return
 	}
 
-	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, cfg.CAUrl, cfg.CVMId, cfg.DomainId), storageDir, reconnectFn, cvmGRPCClient)
+	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, crtSDK, cfg.CAUrl, cfg.CVMId, cfg.DomainId), storageDir, reconnectFn, cvmGRPCClient)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1

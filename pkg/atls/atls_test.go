@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/absmach/certs/sdk"
 	certssdk "github.com/absmach/certs/sdk"
 	"github.com/absmach/supermq/pkg/errors"
 	"github.com/google/go-sev-guest/abi"
@@ -334,7 +335,7 @@ func TestGetCertificateExtension(t *testing.T) {
 }
 
 func TestGetCertificateWithSelfSigned(t *testing.T) {
-	getCertFunc := GetCertificate("", "", "")
+	getCertFunc := GetCertificate(nil, "", "", "")
 
 	nonce := make([]byte, 64)
 	_, err := rand.Read(nonce)
@@ -379,7 +380,11 @@ func TestGetCertificateWithCA(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	getCertFunc := GetCertificate(mockServer.URL, "test-cvm-id", "test-domain-id")
+	getCertFunc := GetCertificate(sdk.NewSDK(
+		sdk.Config{
+			CertsURL: mockServer.URL,
+		},
+	), mockServer.URL, "test-cvm-id", "test-domain-id")
 
 	nonce := make([]byte, 64)
 	_, err := rand.Read(nonce)
@@ -399,7 +404,7 @@ func TestGetCertificateWithCA(t *testing.T) {
 }
 
 func TestGetCertificateInvalidServerName(t *testing.T) {
-	getCertFunc := GetCertificate("", "", "")
+	getCertFunc := GetCertificate(nil, "", "", "")
 
 	cases := []struct {
 		name       string

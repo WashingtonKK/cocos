@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/absmach/certs/sdk"
 	"github.com/stretchr/testify/assert"
 	"github.com/ultravioletrs/cocos/agent"
 	"github.com/ultravioletrs/cocos/agent/mocks"
@@ -88,7 +89,10 @@ func TestNewServer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := NewServer(tt.logger, tt.svc, tt.host, tt.caUrl, tt.cvmId, tt.domainID)
+			server := NewServer(tt.logger, tt.svc, tt.host, sdk.NewSDK(sdk.Config{
+				CertsURL: tt.caUrl,
+				HostURL:  tt.caUrl,
+			}), tt.caUrl, tt.cvmId, tt.domainID)
 
 			assert.NotNil(t, server)
 
@@ -217,7 +221,10 @@ func TestAgentServer_Start(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setupMocks(svc)
 
-			server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
+			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
+				CertsURL: caUrl,
+				HostURL:  caUrl,
+			}), caUrl, cvmId, domainId)
 
 			err := server.Start(tt.cfg, tt.cmp)
 
@@ -293,7 +300,10 @@ func TestAgentServer_Stop(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
+			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
+				CertsURL: caUrl,
+				HostURL:  caUrl,
+			}), caUrl, cvmId, domainId)
 
 			err := tt.setupServer(server)
 			if err != nil {
@@ -321,7 +331,10 @@ func TestAgentServer_Stop(t *testing.T) {
 
 func TestAgentServer_StopMultipleTimes(t *testing.T) {
 	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
-	server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
+	server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
+		CertsURL: caUrl,
+		HostURL:  caUrl,
+	}), caUrl, cvmId, domainId)
 
 	// Start the server
 	cfg := agent.AgentConfig{Port: "7005"}
@@ -365,7 +378,10 @@ func TestAgentServer_StopMultipleTimes(t *testing.T) {
 
 func TestAgentServer_StartAfterStop(t *testing.T) {
 	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
-	server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
+	server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
+		CertsURL: caUrl,
+		HostURL:  caUrl,
+	}), caUrl, cvmId, domainId)
 
 	cfg := agent.AgentConfig{Port: "7006"}
 	cmp := agent.Computation{
@@ -518,7 +534,10 @@ func TestAgentServer_ConfigValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
+			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
+				CertsURL: caUrl,
+				HostURL:  caUrl,
+			}), caUrl, cvmId, domainId)
 
 			err := server.Start(tt.config, tt.cmp)
 

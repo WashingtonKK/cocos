@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/absmach/certs/sdk"
 	"github.com/ultravioletrs/cocos/agent"
 	agentgrpc "github.com/ultravioletrs/cocos/agent/api/grpc"
 	"github.com/ultravioletrs/cocos/agent/auth"
@@ -35,9 +36,10 @@ type agentServer struct {
 	caUrl    string
 	cvmId    string
 	domainId string
+	crtSDK   sdk.SDK
 }
 
-func NewServer(logger *slog.Logger, svc agent.Service, host string, caUrl string, cvmId string, domainId string) AgentServer {
+func NewServer(logger *slog.Logger, svc agent.Service, host string, caSDK sdk.SDK, caUrl string, cvmId string, domainId string) AgentServer {
 	return &agentServer{
 		logger:   logger,
 		svc:      svc,
@@ -45,6 +47,7 @@ func NewServer(logger *slog.Logger, svc agent.Service, host string, caUrl string
 		caUrl:    caUrl,
 		cvmId:    cvmId,
 		domainId: domainId,
+		crtSDK:   caSDK,
 	}
 }
 
@@ -80,7 +83,7 @@ func (as *agentServer) Start(cfg agent.AgentConfig, cmp agent.Computation) error
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.caUrl, as.cvmId, as.domainId)
+	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.crtSDK, as.caUrl, as.cvmId, as.domainId)
 
 	go func() {
 		err := as.gs.Start()
