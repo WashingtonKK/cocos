@@ -18,12 +18,13 @@ import (
 	"github.com/ultravioletrs/cocos/agent/mocks"
 )
 
-func setupTest(t *testing.T) (*slog.Logger, *mocks.Service, string, string, string, []byte) {
+func setupTest(t *testing.T) (*slog.Logger, *mocks.Service, string, string, string, string, []byte) {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}))
 	mockSvc := new(mocks.Service)
 	host := "localhost"
 	caUrl := "https://ca.example.com"
 	cvmId := "test-cvm-id"
+	domainId := "test-domain-id"
 
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	assert.NoError(t, err, "Failed to generate ECDSA key")
@@ -31,11 +32,11 @@ func setupTest(t *testing.T) (*slog.Logger, *mocks.Service, string, string, stri
 	pubkey, err := x509.MarshalPKIXPublicKey(privateKey.Public())
 	assert.NoError(t, err, "Failed to marshal public key")
 
-	return logger, mockSvc, host, caUrl, cvmId, pubkey
+	return logger, mockSvc, host, caUrl, cvmId, domainId, pubkey
 }
 
 func TestNewServer(t *testing.T) {
-	logger, svc, host, caUrl, cvmId, _ := setupTest(t)
+	logger, svc, host, caUrl, cvmId, domainId, _ := setupTest(t)
 
 	tests := []struct {
 		name     string
@@ -44,45 +45,50 @@ func TestNewServer(t *testing.T) {
 		host     string
 		caUrl    string
 		cvmId    string
+		domainID string
 		expected AgentServer
 	}{
 		{
-			name:   "valid server creation",
-			logger: logger,
-			svc:    svc,
-			host:   host,
-			caUrl:  caUrl,
-			cvmId:  cvmId,
+			name:     "valid server creation",
+			logger:   logger,
+			svc:      svc,
+			host:     host,
+			caUrl:    caUrl,
+			cvmId:    cvmId,
+			domainID: domainId,
 		},
 		{
-			name:   "server with empty host",
-			logger: logger,
-			svc:    svc,
-			host:   "",
-			caUrl:  caUrl,
-			cvmId:  cvmId,
+			name:     "server with empty host",
+			logger:   logger,
+			svc:      svc,
+			host:     "",
+			caUrl:    caUrl,
+			cvmId:    cvmId,
+			domainID: domainId,
 		},
 		{
-			name:   "server with empty caUrl",
-			logger: logger,
-			svc:    svc,
-			host:   host,
-			caUrl:  "",
-			cvmId:  cvmId,
+			name:     "server with empty caUrl",
+			logger:   logger,
+			svc:      svc,
+			host:     host,
+			caUrl:    "",
+			cvmId:    cvmId,
+			domainID: domainId,
 		},
 		{
-			name:   "server with empty cvmId",
-			logger: logger,
-			svc:    svc,
-			host:   host,
-			caUrl:  caUrl,
-			cvmId:  "",
+			name:     "server with empty cvmId",
+			logger:   logger,
+			svc:      svc,
+			host:     host,
+			caUrl:    caUrl,
+			cvmId:    "",
+			domainID: domainId,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := NewServer(tt.logger, tt.svc, tt.host, tt.caUrl, tt.cvmId)
+			server := NewServer(tt.logger, tt.svc, tt.host, tt.caUrl, tt.cvmId, tt.domainID)
 
 			assert.NotNil(t, server)
 
@@ -98,7 +104,7 @@ func TestNewServer(t *testing.T) {
 }
 
 func TestAgentServer_Start(t *testing.T) {
-	logger, svc, host, caUrl, cvmId, pubKey := setupTest(t)
+	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
 
 	tests := []struct {
 		name          string
@@ -211,7 +217,7 @@ func TestAgentServer_Start(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setupMocks(svc)
 
-			server := NewServer(logger, svc, host, caUrl, cvmId)
+			server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
 
 			err := server.Start(tt.cfg, tt.cmp)
 
@@ -238,7 +244,7 @@ func TestAgentServer_Start(t *testing.T) {
 }
 
 func TestAgentServer_Stop(t *testing.T) {
-	logger, svc, host, caUrl, cvmId, pubKey := setupTest(t)
+	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
 
 	tests := []struct {
 		name          string
@@ -287,7 +293,7 @@ func TestAgentServer_Stop(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := NewServer(logger, svc, host, caUrl, cvmId)
+			server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
 
 			err := tt.setupServer(server)
 			if err != nil {
@@ -314,8 +320,8 @@ func TestAgentServer_Stop(t *testing.T) {
 }
 
 func TestAgentServer_StopMultipleTimes(t *testing.T) {
-	logger, svc, host, caUrl, cvmId, pubKey := setupTest(t)
-	server := NewServer(logger, svc, host, caUrl, cvmId)
+	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
+	server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
 
 	// Start the server
 	cfg := agent.AgentConfig{Port: "7005"}
@@ -358,8 +364,8 @@ func TestAgentServer_StopMultipleTimes(t *testing.T) {
 }
 
 func TestAgentServer_StartAfterStop(t *testing.T) {
-	logger, svc, host, caUrl, cvmId, pubKey := setupTest(t)
-	server := NewServer(logger, svc, host, caUrl, cvmId)
+	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
+	server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
 
 	cfg := agent.AgentConfig{Port: "7006"}
 	cmp := agent.Computation{
@@ -425,7 +431,7 @@ func TestAgentServer_StartAfterStop(t *testing.T) {
 }
 
 func TestAgentServer_ConfigValidation(t *testing.T) {
-	logger, svc, host, caUrl, cvmId, pubKey := setupTest(t)
+	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
 
 	tests := []struct {
 		name   string
@@ -512,7 +518,7 @@ func TestAgentServer_ConfigValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := NewServer(logger, svc, host, caUrl, cvmId)
+			server := NewServer(logger, svc, host, caUrl, cvmId, domainId)
 
 			err := server.Start(tt.config, tt.cmp)
 

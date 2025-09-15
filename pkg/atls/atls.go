@@ -133,7 +133,7 @@ func VerifyCertificateExtension(extension []byte, pubKey []byte, nonce []byte, p
 	return nil
 }
 
-func GetCertificate(caUrl string, cvmId string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func GetCertificate(caUrl, cvmId, domainId string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	pType := attestation.CCPlatform()
 
 	provider, err := getPlatformProvider(pType)
@@ -247,7 +247,7 @@ func GetCertificate(caUrl string, cvmId string) func(*tls.ClientHelloInfo) (*tls
 
 			certsEndpoint := "certs"
 			csrEndpoint := "csrs"
-			endpoint := fmt.Sprintf("%s/%s/%s", certsEndpoint, csrEndpoint, cvmId)
+			endpoint := fmt.Sprintf("%s/%s/%s/%s", domainId, certsEndpoint, csrEndpoint, cvmId)
 
 			url := fmt.Sprintf("%s/%s?%s", caUrl, endpoint, query_string)
 

@@ -28,21 +28,23 @@ type AgentServer interface {
 }
 
 type agentServer struct {
-	gs     server.Server
-	logger *slog.Logger
-	svc    agent.Service
-	host   string
-	caUrl  string
-	cvmId  string
+	gs       server.Server
+	logger   *slog.Logger
+	svc      agent.Service
+	host     string
+	caUrl    string
+	cvmId    string
+	domainId string
 }
 
-func NewServer(logger *slog.Logger, svc agent.Service, host string, caUrl string, cvmId string) AgentServer {
+func NewServer(logger *slog.Logger, svc agent.Service, host string, caUrl string, cvmId string, domainId string) AgentServer {
 	return &agentServer{
-		logger: logger,
-		svc:    svc,
-		host:   host,
-		caUrl:  caUrl,
-		cvmId:  cvmId,
+		logger:   logger,
+		svc:      svc,
+		host:     host,
+		caUrl:    caUrl,
+		cvmId:    cvmId,
+		domainId: domainId,
 	}
 }
 
@@ -78,7 +80,7 @@ func (as *agentServer) Start(cfg agent.AgentConfig, cmp agent.Computation) error
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.caUrl, as.cvmId)
+	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.caUrl, as.cvmId, as.domainId)
 
 	go func() {
 		err := as.gs.Start()

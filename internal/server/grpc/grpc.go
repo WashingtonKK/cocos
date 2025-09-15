@@ -50,6 +50,7 @@ type Server struct {
 	authSvc         auth.Authenticator
 	caUrl           string
 	cvmId           string
+	domainId        string
 	started         bool
 	stopped         bool
 }
@@ -58,7 +59,7 @@ type serviceRegister func(srv *grpc.Server)
 
 var _ server.Server = (*Server)(nil)
 
-func New(ctx context.Context, cancel context.CancelFunc, name string, config server.ServerConfiguration, registerService serviceRegister, logger *slog.Logger, authSvc auth.Authenticator, caUrl string, cvmId string) server.Server {
+func New(ctx context.Context, cancel context.CancelFunc, name string, config server.ServerConfiguration, registerService serviceRegister, logger *slog.Logger, authSvc auth.Authenticator, caUrl string, cvmId string, domainId string) server.Server {
 	base := config.GetBaseConfig()
 	listenFullAddress := fmt.Sprintf("%s:%s", base.Host, base.Port)
 	return &Server{
@@ -74,6 +75,7 @@ func New(ctx context.Context, cancel context.CancelFunc, name string, config ser
 		authSvc:         authSvc,
 		caUrl:           caUrl,
 		cvmId:           cvmId,
+		domainId:        domainId,
 	}
 }
 
@@ -107,7 +109,7 @@ func (s *Server) Start() error {
 	if agCfg, ok := s.Config.(server.AgentConfig); ok && agCfg.AttestedTLS {
 		tlsConfig := &tls.Config{
 			ClientAuth:     tls.NoClientCert,
-			GetCertificate: atls.GetCertificate(s.caUrl, s.cvmId),
+			GetCertificate: atls.GetCertificate(s.caUrl, s.cvmId, s.domainId),
 		}
 
 		var mtls bool

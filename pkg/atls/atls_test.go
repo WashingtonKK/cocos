@@ -334,7 +334,7 @@ func TestGetCertificateExtension(t *testing.T) {
 }
 
 func TestGetCertificateWithSelfSigned(t *testing.T) {
-	getCertFunc := GetCertificate("", "")
+	getCertFunc := GetCertificate("", "", "")
 
 	nonce := make([]byte, 64)
 	_, err := rand.Read(nonce)
@@ -379,7 +379,7 @@ func TestGetCertificateWithCA(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	getCertFunc := GetCertificate(mockServer.URL, "test-cvm-id")
+	getCertFunc := GetCertificate(mockServer.URL, "test-cvm-id", "test-domain-id")
 
 	nonce := make([]byte, 64)
 	_, err := rand.Read(nonce)
@@ -399,7 +399,7 @@ func TestGetCertificateWithCA(t *testing.T) {
 }
 
 func TestGetCertificateInvalidServerName(t *testing.T) {
-	getCertFunc := GetCertificate("", "")
+	getCertFunc := GetCertificate("", "", "")
 
 	cases := []struct {
 		name       string
