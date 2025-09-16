@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/absmach/certs/sdk"
 	mglog "github.com/absmach/supermq/logger"
 	"github.com/caarlos0/env/v11"
 	"github.com/ultravioletrs/cocos/agent/cvms"
@@ -194,11 +193,7 @@ func main() {
 		return
 	}
 
-	caSDK := sdk.NewSDK(sdk.Config{
-		CertsURL: caUrl,
-	})
-
-	gs := grpcserver.New(ctx, cancel, svcName, grpcServerConfig, registerAgentServiceServer, logger, nil, caSDK, cvmId, domainId)
+	gs := grpcserver.New(ctx, cancel, svcName, grpcServerConfig, registerAgentServiceServer, logger, nil, nil, cvmId, domainId, "")
 
 	g.Go(func() error {
 		return gs.Start()

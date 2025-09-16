@@ -127,7 +127,7 @@ func VerifyCertificateExtension(extension []byte, pubKey []byte, nonce []byte, p
 	return nil
 }
 
-func GetCertificate(caSDK sdk.SDK, cvmId, domainId string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func GetCertificate(caSDK sdk.SDK, cvmId, domainId, agentToken string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	pType := attestation.CCPlatform()
 
 	provider, err := getPlatformProvider(pType)
@@ -224,7 +224,7 @@ func GetCertificate(caSDK sdk.SDK, cvmId, domainId string) func(*tls.ClientHello
 			notAfter := time.Now().AddDate(notAfterYear, notAfterMonth, notAfterDay)
 			ttlString := notAfter.Sub(notBefore).String()
 
-			cert, err := caSDK.IssueFromCSRInternal(cvmId, ttlString, string(csr.CSR))
+			cert, err := caSDK.IssueFromCSRInternal(cvmId, ttlString, string(csr.CSR), agentToken)
 			if err != nil {
 				return nil, err
 			}

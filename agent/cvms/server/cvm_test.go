@@ -19,6 +19,8 @@ import (
 	"github.com/ultravioletrs/cocos/agent/mocks"
 )
 
+const certsToken = "test-certs-token"
+
 func setupTest(t *testing.T) (*slog.Logger, *mocks.Service, string, string, string, string, []byte) {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}))
 	mockSvc := new(mocks.Service)
@@ -91,7 +93,7 @@ func TestNewServer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := NewServer(tt.logger, tt.svc, tt.host, sdk.NewSDK(sdk.Config{
 				CertsURL: tt.caUrl,
-			}), tt.cvmId, tt.domainID)
+			}), tt.cvmId, tt.domainID, certsToken)
 
 			assert.NotNil(t, server)
 
@@ -221,7 +223,7 @@ func TestAgentServer_Start(t *testing.T) {
 
 			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 				CertsURL: caUrl,
-			}), cvmId, domainId)
+			}), cvmId, domainId, certsToken)
 
 			err := server.Start(tt.cfg, tt.cmp)
 
@@ -299,7 +301,7 @@ func TestAgentServer_Stop(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 				CertsURL: caUrl,
-			}), cvmId, domainId)
+			}), cvmId, domainId, certsToken)
 
 			err := tt.setupServer(server)
 			if err != nil {
@@ -329,7 +331,7 @@ func TestAgentServer_StopMultipleTimes(t *testing.T) {
 	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
 	server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 		CertsURL: caUrl,
-	}), cvmId, domainId)
+	}), cvmId, domainId, certsToken)
 
 	// Start the server
 	cfg := agent.AgentConfig{Port: "7005"}
@@ -375,7 +377,7 @@ func TestAgentServer_StartAfterStop(t *testing.T) {
 	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
 	server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 		CertsURL: caUrl,
-	}), cvmId, domainId)
+	}), cvmId, domainId, certsToken)
 
 	cfg := agent.AgentConfig{Port: "7006"}
 	cmp := agent.Computation{
@@ -530,7 +532,7 @@ func TestAgentServer_ConfigValidation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 				CertsURL: caUrl,
-			}), cvmId, domainId)
+			}), cvmId, domainId, certsToken)
 
 			err := server.Start(tt.config, tt.cmp)
 

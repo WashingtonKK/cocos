@@ -54,13 +54,14 @@ type Server struct {
 	started         bool
 	stopped         bool
 	caSDK           sdk.SDK
+	certsToken      string
 }
 
 type serviceRegister func(srv *grpc.Server)
 
 var _ server.Server = (*Server)(nil)
 
-func New(ctx context.Context, cancel context.CancelFunc, name string, config server.ServerConfiguration, registerService serviceRegister, logger *slog.Logger, authSvc auth.Authenticator, casdk sdk.SDK, cvmId string, domainId string) server.Server {
+func New(ctx context.Context, cancel context.CancelFunc, name string, config server.ServerConfiguration, registerService serviceRegister, logger *slog.Logger, authSvc auth.Authenticator, casdk sdk.SDK, cvmId, domainId, agentCertsToken string) server.Server {
 	base := config.GetBaseConfig()
 	listenFullAddress := fmt.Sprintf("%s:%s", base.Host, base.Port)
 	return &Server{
@@ -77,6 +78,7 @@ func New(ctx context.Context, cancel context.CancelFunc, name string, config ser
 		caSDK:           casdk,
 		cvmId:           cvmId,
 		domainId:        domainId,
+		certsToken:      agentCertsToken,
 	}
 }
 
@@ -110,7 +112,7 @@ func (s *Server) Start() error {
 	if agCfg, ok := s.Config.(server.AgentConfig); ok && agCfg.AttestedTLS {
 		tlsConfig := &tls.Config{
 			ClientAuth:     tls.NoClientCert,
-			GetCertificate: atls.GetCertificate(s.caSDK, s.cvmId, s.domainId),
+			GetCertificate: atls.GetCertificate(s.caSDK, s.cvmId, s.domainId, s.certsToken),
 		}
 
 		var mtls bool

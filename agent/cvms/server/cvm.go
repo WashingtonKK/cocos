@@ -29,23 +29,25 @@ type AgentServer interface {
 }
 
 type agentServer struct {
-	gs       server.Server
-	logger   *slog.Logger
-	svc      agent.Service
-	host     string
-	cvmId    string
-	domainId string
-	crtSDK   sdk.SDK
+	gs         server.Server
+	logger     *slog.Logger
+	svc        agent.Service
+	host       string
+	cvmId      string
+	domainId   string
+	crtSDK     sdk.SDK
+	certsToken string
 }
 
-func NewServer(logger *slog.Logger, svc agent.Service, host string, caSDK sdk.SDK, cvmId string, domainId string) AgentServer {
+func NewServer(logger *slog.Logger, svc agent.Service, host string, caSDK sdk.SDK, cvmId string, domainId, certsToken string) AgentServer {
 	return &agentServer{
-		logger:   logger,
-		svc:      svc,
-		host:     host,
-		cvmId:    cvmId,
-		domainId: domainId,
-		crtSDK:   caSDK,
+		logger:     logger,
+		svc:        svc,
+		host:       host,
+		cvmId:      cvmId,
+		domainId:   domainId,
+		crtSDK:     caSDK,
+		certsToken: certsToken,
 	}
 }
 
@@ -81,7 +83,7 @@ func (as *agentServer) Start(cfg agent.AgentConfig, cmp agent.Computation) error
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.crtSDK, as.cvmId, as.domainId)
+	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.crtSDK, as.cvmId, as.domainId, as.certsToken)
 
 	go func() {
 		err := as.gs.Start()

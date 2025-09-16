@@ -42,16 +42,17 @@ const (
 )
 
 type config struct {
-	LogLevel      string `env:"AGENT_LOG_LEVEL"  envDefault:"debug"`
-	Vmpl          int    `env:"AGENT_VMPL"       envDefault:"2"`
-	AgentGrpcHost string `env:"AGENT_GRPC_HOST"  envDefault:"0.0.0.0"`
-	CAUrl         string `env:"AGENT_CVM_CA_URL" envDefault:""`
-	CVMId         string `env:"AGENT_CVM_ID"     envDefault:""`
-	DomainId      string `env:"AGENT_DOMAIN_ID"  envDefault:""`
-	AgentMaaURL   string `env:"AGENT_MAA_URL"    envDefault:"https://sharedeus2.eus2.attest.azure.net"`
-	AgentOSBuild  string `env:"AGENT_OS_BUILD"   envDefault:"UVC"`
-	AgentOSDistro string `env:"AGENT_OS_DISTRO"  envDefault:"UVC"`
-	AgentOSType   string `env:"AGENT_OS_TYPE"    envDefault:"UVC"`
+	LogLevel      string `env:"AGENT_LOG_LEVEL"   envDefault:"debug"`
+	Vmpl          int    `env:"AGENT_VMPL"        envDefault:"2"`
+	AgentGrpcHost string `env:"AGENT_GRPC_HOST"   envDefault:"0.0.0.0"`
+	CAUrl         string `env:"AGENT_CVM_CA_URL"  envDefault:""`
+	CVMId         string `env:"AGENT_CVM_ID"      envDefault:""`
+	DomainId      string `env:"AGENT_DOMAIN_ID"   envDefault:""`
+	CertsToken    string `env:"AGENT_CERTS_TOKEN" envDefault:""`
+	AgentMaaURL   string `env:"AGENT_MAA_URL"     envDefault:"https://sharedeus2.eus2.attest.azure.net"`
+	AgentOSBuild  string `env:"AGENT_OS_BUILD"    envDefault:"UVC"`
+	AgentOSDistro string `env:"AGENT_OS_DISTRO"   envDefault:"UVC"`
+	AgentOSType   string `env:"AGENT_OS_TYPE"     envDefault:"UVC"`
 }
 
 func main() {
@@ -169,7 +170,7 @@ func main() {
 		return
 	}
 
-	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, crtSDK, cfg.CVMId, cfg.DomainId), storageDir, reconnectFn, cvmGRPCClient)
+	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, crtSDK, cfg.CVMId, cfg.DomainId, cfg.CertsToken), storageDir, reconnectFn, cvmGRPCClient)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
