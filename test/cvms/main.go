@@ -198,7 +198,7 @@ func main() {
 		CertsURL: caUrl,
 	})
 
-	gs := grpcserver.New(ctx, cancel, svcName, grpcServerConfig, registerAgentServiceServer, logger, nil, caSDK, caUrl, cvmId, domainId)
+	gs := grpcserver.New(ctx, cancel, svcName, grpcServerConfig, registerAgentServiceServer, logger, nil, caSDK, cvmId, domainId)
 
 	g.Go(func() error {
 		return gs.Start()

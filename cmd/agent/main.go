@@ -153,12 +153,13 @@ func main() {
 		return
 	}
 
-	ctrsdkconfig := certsSDK.Config{
-		CertsURL: cfg.CAUrl,
-		HostURL:  cfg.CAUrl,
+	var crtSDK certsSDK.SDK
+	if cfg.CAUrl != "" {
+		ctrsdkconfig := certsSDK.Config{
+			CertsURL: cfg.CAUrl,
+		}
+		crtSDK = certsSDK.NewSDK(ctrsdkconfig)
 	}
-
-	crtSDK := certsSDK.NewSDK(ctrsdkconfig)
 
 	svc := newService(ctx, logger, eventSvc, provider, cfg.Vmpl)
 
@@ -168,7 +169,7 @@ func main() {
 		return
 	}
 
-	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, crtSDK, cfg.CAUrl, cfg.CVMId, cfg.DomainId), storageDir, reconnectFn, cvmGRPCClient)
+	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, crtSDK, cfg.CVMId, cfg.DomainId), storageDir, reconnectFn, cvmGRPCClient)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1

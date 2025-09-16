@@ -91,8 +91,7 @@ func TestNewServer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := NewServer(tt.logger, tt.svc, tt.host, sdk.NewSDK(sdk.Config{
 				CertsURL: tt.caUrl,
-				HostURL:  tt.caUrl,
-			}), tt.caUrl, tt.cvmId, tt.domainID)
+			}), tt.cvmId, tt.domainID)
 
 			assert.NotNil(t, server)
 
@@ -101,7 +100,6 @@ func TestNewServer(t *testing.T) {
 			assert.Equal(t, tt.logger, agentSrv.logger)
 			assert.Equal(t, tt.svc, agentSrv.svc)
 			assert.Equal(t, tt.host, agentSrv.host)
-			assert.Equal(t, tt.caUrl, agentSrv.caUrl)
 			assert.Equal(t, tt.cvmId, agentSrv.cvmId)
 		})
 	}
@@ -223,8 +221,7 @@ func TestAgentServer_Start(t *testing.T) {
 
 			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 				CertsURL: caUrl,
-				HostURL:  caUrl,
-			}), caUrl, cvmId, domainId)
+			}), cvmId, domainId)
 
 			err := server.Start(tt.cfg, tt.cmp)
 
@@ -302,8 +299,7 @@ func TestAgentServer_Stop(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 				CertsURL: caUrl,
-				HostURL:  caUrl,
-			}), caUrl, cvmId, domainId)
+			}), cvmId, domainId)
 
 			err := tt.setupServer(server)
 			if err != nil {
@@ -333,8 +329,7 @@ func TestAgentServer_StopMultipleTimes(t *testing.T) {
 	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
 	server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 		CertsURL: caUrl,
-		HostURL:  caUrl,
-	}), caUrl, cvmId, domainId)
+	}), cvmId, domainId)
 
 	// Start the server
 	cfg := agent.AgentConfig{Port: "7005"}
@@ -380,8 +375,7 @@ func TestAgentServer_StartAfterStop(t *testing.T) {
 	logger, svc, host, caUrl, cvmId, domainId, pubKey := setupTest(t)
 	server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 		CertsURL: caUrl,
-		HostURL:  caUrl,
-	}), caUrl, cvmId, domainId)
+	}), cvmId, domainId)
 
 	cfg := agent.AgentConfig{Port: "7006"}
 	cmp := agent.Computation{
@@ -536,8 +530,7 @@ func TestAgentServer_ConfigValidation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := NewServer(logger, svc, host, sdk.NewSDK(sdk.Config{
 				CertsURL: caUrl,
-				HostURL:  caUrl,
-			}), caUrl, cvmId, domainId)
+			}), cvmId, domainId)
 
 			err := server.Start(tt.config, tt.cmp)
 

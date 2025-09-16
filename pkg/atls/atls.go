@@ -127,7 +127,7 @@ func VerifyCertificateExtension(extension []byte, pubKey []byte, nonce []byte, p
 	return nil
 }
 
-func GetCertificate(caSDK sdk.SDK, caUrl, cvmId, domainId string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func GetCertificate(caSDK sdk.SDK, cvmId, domainId string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	pType := attestation.CCPlatform()
 
 	provider, err := getPlatformProvider(pType)
@@ -179,7 +179,7 @@ func GetCertificate(caSDK sdk.SDK, caUrl, cvmId, domainId string) func(*tls.Clie
 
 		var certDERBytes []byte
 
-		if caUrl == "" && cvmId == "" {
+		if caSDK == nil && cvmId == "" {
 			certTemplate := &x509.Certificate{
 				SerialNumber: big.NewInt(202403311),
 				Subject: pkix.Name{
