@@ -224,7 +224,7 @@ func GetCertificate(caSDK sdk.SDK, cvmId, domainId string) func(*tls.ClientHello
 			notAfter := time.Now().AddDate(notAfterYear, notAfterMonth, notAfterDay)
 			ttlString := notAfter.Sub(notBefore).String()
 
-			cert, err := caSDK.IssueFromCSR(cvmId, ttlString, string(csr.CSR), domainId, "")
+			cert, err := caSDK.IssueFromCSRInternal(cvmId, ttlString, string(csr.CSR))
 			if err != nil {
 				return nil, err
 			}
