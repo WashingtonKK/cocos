@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/absmach/certs/sdk"
 	"github.com/ultravioletrs/cocos/agent"
 	agentgrpc "github.com/ultravioletrs/cocos/agent/api/grpc"
 	"github.com/ultravioletrs/cocos/agent/auth"
@@ -28,21 +29,25 @@ type AgentServer interface {
 }
 
 type agentServer struct {
-	gs     server.Server
-	logger *slog.Logger
-	svc    agent.Service
-	host   string
-	caUrl  string
-	cvmId  string
+	gs         server.Server
+	logger     *slog.Logger
+	svc        agent.Service
+	host       string
+	cvmId      string
+	domainId   string
+	crtSDK     sdk.SDK
+	certsToken string
 }
 
-func NewServer(logger *slog.Logger, svc agent.Service, host string, caUrl string, cvmId string) AgentServer {
+func NewServer(logger *slog.Logger, svc agent.Service, host string, caSDK sdk.SDK, cvmId string, domainId, certsToken string) AgentServer {
 	return &agentServer{
-		logger: logger,
-		svc:    svc,
-		host:   host,
-		caUrl:  caUrl,
-		cvmId:  cvmId,
+		logger:     logger,
+		svc:        svc,
+		host:       host,
+		cvmId:      cvmId,
+		domainId:   domainId,
+		crtSDK:     caSDK,
+		certsToken: certsToken,
 	}
 }
 
@@ -78,7 +83,7 @@ func (as *agentServer) Start(cfg agent.AgentConfig, cmp agent.Computation) error
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.caUrl, as.cvmId)
+	as.gs = grpcserver.New(ctx, cancel, svcName, agentGrpcServerConfig, registerAgentServiceServer, as.logger, authSvc, as.crtSDK, as.cvmId, as.domainId, as.certsToken)
 
 	go func() {
 		err := as.gs.Start()

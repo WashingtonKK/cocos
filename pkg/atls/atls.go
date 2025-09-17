@@ -12,20 +12,18 @@ import (
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"encoding/hex"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io"
 	"math/big"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/absmach/certs"
 	certscli "github.com/absmach/certs/cli"
-	"github.com/absmach/certs/errors"
-	certssdk "github.com/absmach/certs/sdk"
+	"github.com/absmach/certs/sdk"
+	"github.com/absmach/supermq/pkg/errors"
 	"github.com/ultravioletrs/cocos/pkg/attestation"
 	"github.com/ultravioletrs/cocos/pkg/attestation/azure"
 	"github.com/ultravioletrs/cocos/pkg/attestation/tdx"
@@ -52,10 +50,6 @@ var (
 	AzureOID   = asn1.ObjectIdentifier{2, 99999, 1, 1}
 	TDXOID     = asn1.ObjectIdentifier{2, 99999, 1, 2}
 )
-
-type csrReq struct {
-	CSR string `json:"csr,omitempty"`
-}
 
 func getPlatformProvider(platformType attestation.PlatformType) (attestation.Provider, error) {
 	switch platformType {
@@ -134,7 +128,7 @@ func VerifyCertificateExtension(extension []byte, pubKey []byte, nonce []byte, p
 	return nil
 }
 
-func GetCertificate(caUrl string, cvmId string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func GetCertificate(caSDK sdk.SDK, cvmId, domainId, agentToken string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	pType := attestation.CCPlatform()
 
 	provider, err := getPlatformProvider(pType)
@@ -186,7 +180,7 @@ func GetCertificate(caUrl string, cvmId string) func(*tls.ClientHelloInfo) (*tls
 
 		var certDERBytes []byte
 
-		if caUrl == "" && cvmId == "" {
+		if caSDK == nil && cvmId == "" {
 			certTemplate := &x509.Certificate{
 				SerialNumber: big.NewInt(202403311),
 				Subject: pkix.Name{
@@ -228,39 +222,13 @@ func GetCertificate(caUrl string, cvmId string) func(*tls.ClientHelloInfo) (*tls
 				return nil, fmt.Errorf("failed to create CSR: %w", err)
 			}
 
-			csrData := string(csr.CSR)
-
-			r := csrReq{
-				CSR: csrData,
-			}
-
-			data, sdkErr := json.Marshal(r)
-			if sdkErr != nil {
-				return nil, fmt.Errorf("failed to marshal CSR request: %w", sdkErr)
-			}
-
 			notBefore := time.Now()
 			notAfter := time.Now().AddDate(notAfterYear, notAfterMonth, notAfterDay)
 			ttlString := notAfter.Sub(notBefore).String()
 
-			query := url.Values{}
-			query.Add("ttl", ttlString)
-			query_string := query.Encode()
-
-			certsEndpoint := "certs"
-			csrEndpoint := "csrs"
-			endpoint := fmt.Sprintf("%s/%s/%s", certsEndpoint, csrEndpoint, cvmId)
-
-			url := fmt.Sprintf("%s/%s?%s", caUrl, endpoint, query_string)
-
-			_, body, err := processRequest(http.MethodPost, url, data, nil, http.StatusOK)
+			cert, err := caSDK.IssueFromCSRInternal(cvmId, ttlString, string(csr.CSR), agentToken)
 			if err != nil {
-				return nil, fmt.Errorf("failed to process request: %w", err)
-			}
-
-			var cert certssdk.Certificate
-			if err := json.Unmarshal(body, &cert); err != nil {
-				return nil, fmt.Errorf("failed to unmarshal certificate response: %w", err)
+				return nil, err
 			}
 
 			cleanCertificateString := strings.ReplaceAll(cert.Certificate, "\\n", "\n")

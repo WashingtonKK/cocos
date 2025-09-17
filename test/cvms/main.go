@@ -43,6 +43,7 @@ var (
 	caUrl             string
 	cvmId             string
 	clientCAFile      string
+	domainId          string
 )
 
 type svc struct {
@@ -110,11 +111,12 @@ func main() {
 	flagSet.StringVar(&dataPathString, "data-paths", "", "Paths to data sources, list of string separated with commas")
 	flagSet.StringVar(&caUrl, "ca-url", "", "URL for certificate authority, must be specified if aTLS is used")
 	flagSet.StringVar(&cvmId, "cvm-id", "", "UUID for a CVM, must be specified if aTLS is used")
+	flagSet.StringVar(&domainId, "domain-id", "", "Domain ID for the attestation service, must be specified if aTLS is used")
 	flagSet.StringVar(&clientCAFile, "client-ca-file", "", "Client CA root certificate file path")
 
 	flagSetParseError := flagSet.Parse(os.Args[1:])
 	if flagSetParseError != nil {
-		log.Fatalf("Error parsing flagas: %v", flagSetParseError)
+		log.Fatalf("Error parsing flags: %v", flagSetParseError)
 	}
 
 	parsingError := !flagSet.Parsed()
@@ -191,7 +193,7 @@ func main() {
 		return
 	}
 
-	gs := grpcserver.New(ctx, cancel, svcName, grpcServerConfig, registerAgentServiceServer, logger, nil, caUrl, cvmId)
+	gs := grpcserver.New(ctx, cancel, svcName, grpcServerConfig, registerAgentServiceServer, logger, nil, nil, cvmId, domainId, "")
 
 	g.Go(func() error {
 		return gs.Start()

@@ -14,8 +14,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
+	certsSDK "github.com/absmach/certs/sdk"
 	mglog "github.com/absmach/supermq/logger"
 	"github.com/absmach/supermq/pkg/prometheus"
 	"github.com/caarlos0/env/v11"
@@ -37,22 +37,22 @@ import (
 
 const (
 	svcName          = "agent"
-	defSvcGRPCPort   = "7002"
-	retryInterval    = 5 * time.Second
 	envPrefixCVMGRPC = "AGENT_CVM_GRPC_"
 	storageDir       = "/var/lib/cocos/agent"
 )
 
 type config struct {
-	LogLevel      string `env:"AGENT_LOG_LEVEL"  envDefault:"debug"`
-	Vmpl          int    `env:"AGENT_VMPL"       envDefault:"2"`
-	AgentGrpcHost string `env:"AGENT_GRPC_HOST"  envDefault:"0.0.0.0"`
-	CAUrl         string `env:"AGENT_CVM_CA_URL" envDefault:""`
-	CVMId         string `env:"AGENT_CVM_ID"     envDefault:""`
-	AgentMaaURL   string `env:"AGENT_MAA_URL"    envDefault:"https://sharedeus2.eus2.attest.azure.net"`
-	AgentOSBuild  string `env:"AGENT_OS_BUILD"   envDefault:"UVC"`
-	AgentOSDistro string `env:"AGENT_OS_DISTRO"  envDefault:"UVC"`
-	AgentOSType   string `env:"AGENT_OS_TYPE"    envDefault:"UVC"`
+	LogLevel      string `env:"AGENT_LOG_LEVEL"   envDefault:"debug"`
+	Vmpl          int    `env:"AGENT_VMPL"        envDefault:"2"`
+	AgentGrpcHost string `env:"AGENT_GRPC_HOST"   envDefault:"0.0.0.0"`
+	CAUrl         string `env:"AGENT_CVM_CA_URL"  envDefault:""`
+	CVMId         string `env:"AGENT_CVM_ID"      envDefault:""`
+	DomainId      string `env:"AGENT_DOMAIN_ID"   envDefault:""`
+	CertsToken    string `env:"AGENT_CERTS_TOKEN" envDefault:""`
+	AgentMaaURL   string `env:"AGENT_MAA_URL"     envDefault:"https://sharedeus2.eus2.attest.azure.net"`
+	AgentOSBuild  string `env:"AGENT_OS_BUILD"    envDefault:"UVC"`
+	AgentOSDistro string `env:"AGENT_OS_DISTRO"   envDefault:"UVC"`
+	AgentOSType   string `env:"AGENT_OS_TYPE"     envDefault:"UVC"`
 }
 
 func main() {
@@ -154,6 +154,14 @@ func main() {
 		return
 	}
 
+	var crtSDK certsSDK.SDK
+	if cfg.CAUrl != "" {
+		ctrsdkconfig := certsSDK.Config{
+			CertsURL: cfg.CAUrl,
+		}
+		crtSDK = certsSDK.NewSDK(ctrsdkconfig)
+	}
+
 	svc := newService(ctx, logger, eventSvc, provider, cfg.Vmpl)
 
 	if err := os.MkdirAll(storageDir, 0o755); err != nil {
@@ -162,7 +170,7 @@ func main() {
 		return
 	}
 
-	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, cfg.CAUrl, cfg.CVMId), storageDir, reconnectFn, cvmGRPCClient)
+	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, crtSDK, cfg.CVMId, cfg.DomainId, cfg.CertsToken), storageDir, reconnectFn, cvmGRPCClient)
 	if err != nil {
 		logger.Error(err.Error())
 		exitCode = 1
