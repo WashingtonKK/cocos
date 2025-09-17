@@ -125,6 +125,13 @@ func (x *CreateReq) GetAgentCertsToken() string {
 	return ""
 }
 
+func (x *CreateReq) GetAgentCertsToken() string {
+	if x != nil {
+		return x.AgentCertsToken
+	}
+	return ""
+}
+
 type CreateRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ForwardedPort string                 `protobuf:"bytes,1,opt,name=forwarded_port,json=forwardedPort,proto3" json:"forwarded_port,omitempty"`
