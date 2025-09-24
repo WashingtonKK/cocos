@@ -167,6 +167,8 @@ func main() {
 
 	logger.Debug("Detected CC Platform")
 	logger.Debug(fmt.Sprintf("CC Platform: %s", ccPlatform))
+	logger.Info("Using attestation provider for :")
+	logger.Info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go")
 	fmt.Println("CC Platform:", ccPlatform)
 	if ccPlatform != attestation.NoCC {
 		certProvider, err = atls.NewProvider(provider, ccPlatform, cfg.CVMId, cfg.CAUrl, cfg.DomainId, cfg.CertsToken)
