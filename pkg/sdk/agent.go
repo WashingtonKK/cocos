@@ -67,6 +67,7 @@ func (sdk *agentSDK) Algo(ctx context.Context, algorithm, requirements *os.File,
 
 	stream, err := sdk.client.Algo(ctx)
 	if err != nil {
+		fmt.Println("Error creating stream:", err)
 		return err
 	}
 	fmt.Println("SDK stream created")
