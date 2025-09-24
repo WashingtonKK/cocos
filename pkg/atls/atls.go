@@ -18,14 +18,15 @@ import (
 
 	"github.com/absmach/certs"
 	certscli "github.com/absmach/certs/cli"
-	"github.com/absmach/certs/errors"
 	certssdk "github.com/absmach/certs/sdk"
+	"github.com/absmach/supermq/pkg/errors"
 )
 
 const (
 	defaultNotAfterYears = 1
 	nonceLength          = 64
 	nonceSuffix          = ".nonce"
+	bearerPrefix         = "Bearer "
 )
 
 // Platform-specific OIDs for certificate extensions.
@@ -59,22 +60,24 @@ func DefaultCertificateSubject() CertificateSubject {
 
 // CAClient handles communication with Certificate Authority.
 type CAClient struct {
-	baseURL string
-	client  *http.Client
+	baseURL    string
+	client     *http.Client
+	agentToken string
 }
 
 type CSRRequest struct {
 	CSR string `json:"csr,omitempty"`
 }
 
-func NewCAClient(baseURL string) *CAClient {
+func NewCAClient(baseURL string, agentToken string) *CAClient {
 	return &CAClient{
-		baseURL: baseURL,
-		client:  &http.Client{},
+		baseURL:    baseURL,
+		client:     &http.Client{},
+		agentToken: agentToken,
 	}
 }
 
-func (c *CAClient) RequestCertificate(csrMetadata certs.CSRMetadata, privateKey *ecdsa.PrivateKey, cvmID string, ttl time.Duration) ([]byte, error) {
+func (c *CAClient) RequestCertificate(csrMetadata certs.CSRMetadata, privateKey *ecdsa.PrivateKey, cvmID, domainId string, ttl time.Duration) ([]byte, error) {
 	csr, sdkerr := certscli.CreateCSR(csrMetadata, privateKey)
 	if sdkerr != nil {
 		return nil, fmt.Errorf("failed to create CSR: %w", sdkerr)
@@ -91,7 +94,7 @@ func (c *CAClient) RequestCertificate(csrMetadata certs.CSRMetadata, privateKey 
 	query.Add("ttl", ttl.String())
 	requestURL := fmt.Sprintf("%s/%s?%s", c.baseURL, endpoint, query.Encode())
 
-	_, responseBody, err := c.processRequest(http.MethodPost, requestURL, requestData, nil, http.StatusOK)
+	_, responseBody, err := c.processRequest(http.MethodPost, requestURL, requestData, nil, c.agentToken, http.StatusOK)
 	if err != nil {
 		return nil, fmt.Errorf("failed to process CA request: %w", err)
 	}
@@ -114,7 +117,7 @@ func (c *CAClient) RequestCertificate(csrMetadata certs.CSRMetadata, privateKey 
 	return block.Bytes, nil
 }
 
-func (c *CAClient) processRequest(method, reqURL string, data []byte, headers map[string]string, expectedRespCodes ...int) (http.Header, []byte, errors.SDKError) {
+func (c *CAClient) processRequest(method, reqURL string, data []byte, headers map[string]string, token string, expectedRespCodes ...int) (http.Header, []byte, errors.SDKError) {
 	req, err := http.NewRequest(method, reqURL, bytes.NewReader(data))
 	if err != nil {
 		return make(http.Header), []byte{}, errors.NewSDKError(err)
@@ -123,6 +126,11 @@ func (c *CAClient) processRequest(method, reqURL string, data []byte, headers ma
 	req.Header.Add("Content-Type", "application/json")
 	for key, value := range headers {
 		req.Header.Add(key, value)
+	}
+
+	if token != "" {
+		token = fmt.Sprintf("%s%s", bearerPrefix, token)
+		req.Header.Set("Authorization", token)
 	}
 
 	resp, err := c.client.Do(req)
