@@ -89,6 +89,8 @@ func main() {
 
 	var provider attestation.Provider
 	ccPlatform := attestation.CCPlatform()
+	logger.Error(fmt.Sprintf("Detected CC Platform: %s", ccPlatform))
+	logger.Error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go, CC PLATFORM")
 
 	azureConfig := azure.NewEnvConfigFromAgent(
 		cfg.AgentOSBuild,
@@ -170,6 +172,7 @@ func main() {
 	logger.Info("Using attestation provider for :")
 	logger.Info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go")
 	fmt.Println("CC Platform:", ccPlatform)
+	logger.Error(fmt.Sprintf("%v : Cert provider", certProvider))
 	if ccPlatform != attestation.NoCC {
 		var certsSDK sdk.SDK
 		if cfg.CAUrl != "" {
@@ -185,6 +188,8 @@ func main() {
 			exitCode = 1
 			return
 		}
+	} else {
+		logger.Info("No CC platform detected, certificate provider will be nil")
 	}
 
 	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, certProvider), storageDir, reconnectFn, cvmGRPCClient)

@@ -11,6 +11,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -52,6 +53,7 @@ func NewAgentSDK(agentClient agent.AgentServiceClient) SDK {
 }
 
 func (sdk *agentSDK) Algo(ctx context.Context, algorithm, requirements *os.File, privKey any) error {
+	fmt.Println("SDK beginin=gngin")
 	md, err := generateMetadata(string(auth.AlgorithmProviderRole), privKey)
 	if err != nil {
 		return err

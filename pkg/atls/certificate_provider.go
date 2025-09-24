@@ -172,6 +172,7 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *ec
 }
 
 func NewProvider(provider attestation.Provider, platformType attestation.PlatformType, agentToken, cvmID string, certsSDK sdk.SDK) (CertificateProvider, error) {
+	fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	attestationProvider, err := NewAttestationProvider(provider, platformType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create attestation provider: %w", err)
@@ -181,6 +182,7 @@ func NewProvider(provider attestation.Provider, platformType attestation.Platfor
 
 	if certsSDK != nil {
 		return NewAttestedCAProvider(attestationProvider, subject, certsSDK, cvmID, agentToken), nil
+		fmt.Println("Creating CA-signed certificate provider")
 	}
 
 	return NewAttestedProvider(attestationProvider, subject), nil
