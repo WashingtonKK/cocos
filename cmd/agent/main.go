@@ -165,6 +165,9 @@ func main() {
 
 	var certProvider atls.CertificateProvider
 
+	logger.Debug("Detected CC Platform")
+	logger.Debug(fmt.Sprintf("CC Platform: %s", ccPlatform))
+	fmt.Println("CC Platform:", ccPlatform)
 	if ccPlatform != attestation.NoCC {
 		var certsSDK sdk.SDK
 		if cfg.CAUrl != "" {
@@ -172,6 +175,8 @@ func main() {
 				HostURL: cfg.CAUrl,
 			})
 		}
+		logger.Info("Using cert provider for :")
+		logger.Info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go")
 		certProvider, err = atls.NewProvider(provider, ccPlatform, cfg.CertsToken, cfg.CVMId, certsSDK)
 		if err != nil {
 			logger.Error(fmt.Sprintf("failed to create certificate provider: %s", err))
