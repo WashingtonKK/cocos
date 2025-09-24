@@ -58,15 +58,18 @@ func (sdk *agentSDK) Algo(ctx context.Context, algorithm, requirements *os.File,
 	if err != nil {
 		return err
 	}
+	fmt.Println("Metadata generated")
 
 	for k, v := range md {
 		ctx = metadata.AppendToOutgoingContext(ctx, k, v[0])
 	}
+	fmt.Println("Metadata generated")
 
 	stream, err := sdk.client.Algo(ctx)
 	if err != nil {
 		return err
 	}
+	fmt.Println("SDK stream created")
 
 	pb := progressbar.New(false)
 	return pb.SendAlgorithm(algoProgressBarDescription, algorithm, requirements, stream)
