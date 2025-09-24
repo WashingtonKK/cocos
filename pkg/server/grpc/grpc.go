@@ -56,7 +56,7 @@ func New(
 
 	if agentConfig, ok := config.(server.AgentConfig); ok && agentConfig.AttestedTLS {
 		if certProvider == nil {
-			logger.Error("Failed to create certificate provider")
+			logger.Error("Failed to create certificate provider, certProvider is nil")
 		} else {
 			attestedTLS = true
 		}

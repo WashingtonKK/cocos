@@ -83,6 +83,7 @@ func New(isDownload bool) *ProgressBar {
 }
 
 func (p *ProgressBar) SendAlgorithm(description string, algo, req *os.File, stream agent.AgentService_AlgoClient) error {
+	fmt.Println("Begin progress bar...")
 	algoFileInfo, err := algo.Stat()
 	if err != nil {
 		return err

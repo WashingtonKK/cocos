@@ -149,6 +149,7 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *ec
 }
 
 func NewProvider(provider attestation.Provider, platformType attestation.PlatformType, caURL, cvmID, domainId, agentToken string) (CertificateProvider, error) {
+	fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	attestationProvider, err := NewAttestationProvider(provider, platformType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create attestation provider: %w", err)
@@ -157,6 +158,7 @@ func NewProvider(provider attestation.Provider, platformType attestation.Platfor
 	subject := DefaultCertificateSubject()
 
 	if caURL != "" && cvmID != "" {
+		fmt.Println("Creating CA-signed certificate provider")
 		return NewAttestedCAProvider(attestationProvider, subject, caURL, cvmID, domainId, agentToken), nil
 	}
 

@@ -89,6 +89,8 @@ func main() {
 
 	var provider attestation.Provider
 	ccPlatform := attestation.CCPlatform()
+	logger.Error(fmt.Sprintf("Detected CC Platform: %s", ccPlatform))
+	logger.Error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go, CC PLATFORM")
 
 	azureConfig := azure.NewEnvConfigFromAgent(
 		cfg.AgentOSBuild,
@@ -170,15 +172,21 @@ func main() {
 	logger.Info("Using attestation provider for :")
 	logger.Info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go")
 	fmt.Println("CC Platform:", ccPlatform)
+	logger.Error(fmt.Sprintf("%v : Cert provider", certProvider))
 	if ccPlatform != attestation.NoCC {
 		certProvider, err = atls.NewProvider(provider, ccPlatform, cfg.CVMId, cfg.CAUrl, cfg.DomainId, cfg.CertsToken)
 		logger.Info("Using cert provider for :")
-		logger.Info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go")
+		logger.Error("Creating certificate provider")
+		logger.Error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go")
+		logger.Error(fmt.Sprintf("%v : Cert provider", certProvider))
+		logger.Error(fmt.Sprintf("ERrror: %v", err))
 		if err != nil {
 			logger.Error(fmt.Sprintf("failed to create certificate provider: %s", err))
 			exitCode = 1
 			return
 		}
+	} else {
+		logger.Info("No CC platform detected, certificate provider will be nil")
 	}
 
 	mc, err := cvmsapi.NewClient(pc, svc, eventsLogsQueue, logger, server.NewServer(logger, svc, cfg.AgentGrpcHost, certProvider), storageDir, reconnectFn, cvmGRPCClient)
