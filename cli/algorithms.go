@@ -5,6 +5,7 @@ package cli
 import (
 	"context"
 	"encoding/pem"
+	"fmt"
 	"os"
 
 	"github.com/fatih/color"
@@ -71,6 +72,7 @@ func (cli *CLI) NewAlgorithmCmd() *cobra.Command {
 
 			ctx := metadata.NewOutgoingContext(cmd.Context(), metadata.New(make(map[string]string)))
 
+			fmt.Println("This may take a while depending on the size of the algorithm and your connection speed...")
 			if err := cli.agentSDK.Algo(addAlgoMetadata(ctx), algorithm, req, privKey); err != nil {
 				printError(cmd, "Failed to upload algorithm due to error: %v ❌ ", err)
 				return
