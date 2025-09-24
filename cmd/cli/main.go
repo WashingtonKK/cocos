@@ -117,6 +117,8 @@ func main() {
 	}
 
 	cliSVC := cli.New(agentGRPCConfig, managerGRPCConfig, measurement)
+	fmt.Println("Initializing Agent SDK...")
+	fmt.Println(agentGRPCConfig)
 
 	if err := cliSVC.InitializeAgentSDK(rootCmd); err == nil {
 		defer cliSVC.Close()
