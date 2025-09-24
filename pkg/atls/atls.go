@@ -118,6 +118,7 @@ func (c *CAClient) RequestCertificate(csrMetadata certs.CSRMetadata, privateKey 
 }
 
 func (c *CAClient) processRequest(method, reqURL string, data []byte, headers map[string]string, token string, expectedRespCodes ...int) (http.Header, []byte, errors.SDKError) {
+	fmt.Println("Request URL:", reqURL)
 	req, err := http.NewRequest(method, reqURL, bytes.NewReader(data))
 	if err != nil {
 		return make(http.Header), []byte{}, errors.NewSDKError(err)
