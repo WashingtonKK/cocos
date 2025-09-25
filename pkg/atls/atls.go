@@ -78,6 +78,10 @@ func NewCAClient(baseURL string, agentToken string) *CAClient {
 }
 
 func (c *CAClient) RequestCertificate(csrMetadata certs.CSRMetadata, privateKey *ecdsa.PrivateKey, cvmID, domainId string, ttl time.Duration) ([]byte, error) {
+	fmt.Println("Requesting certificate for CVM ID:", cvmID)
+	fmt.Println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+	fmt.Println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+	fmt.Println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
 	csr, sdkerr := certscli.CreateCSR(csrMetadata, privateKey)
 	if sdkerr != nil {
 		return nil, fmt.Errorf("failed to create CSR: %w", sdkerr)
@@ -113,7 +117,10 @@ func (c *CAClient) RequestCertificate(csrMetadata certs.CSRMetadata, privateKey 
 	if block == nil {
 		return nil, fmt.Errorf("failed to decode certificate PEM: no PEM block found")
 	}
-
+	fmt.Println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+	fmt.Println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+	fmt.Println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+	fmt.Println("|||||||||||||||||||||||||||||||----------------------------------|||||||||||||||||||||||||||||||||||||||||||||||||||||")
 	return block.Bytes, nil
 }
 

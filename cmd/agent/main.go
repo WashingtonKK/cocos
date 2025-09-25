@@ -178,8 +178,10 @@ func main() {
 		logger.Info("Using cert provider for :")
 		logger.Error("Creating certificate provider")
 		logger.Error("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ - Main.go")
+		logger.Error(cfg.CAUrl)
+		logger.Error("CA URL00000000000000000000000000000000: " + cfg.CAUrl)
 		logger.Error(fmt.Sprintf("%v : Cert provider", certProvider))
-		logger.Error(fmt.Sprintf("ERrror: %v", err))
+		logger.Error(fmt.Sprintf("EError: %v", err))
 		if err != nil {
 			logger.Error(fmt.Sprintf("failed to create certificate provider: %s", err))
 			exitCode = 1
