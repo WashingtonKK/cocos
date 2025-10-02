@@ -3,9 +3,8 @@
 package atls
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -73,7 +72,7 @@ func (p *attestedCertificateProvider) SetTTL(ttl time.Duration) {
 }
 
 func (p *attestedCertificateProvider) GetCertificate(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate private key: %w", err)
 	}
@@ -115,7 +114,7 @@ func (p *attestedCertificateProvider) GetCertificate(clientHello *tls.ClientHell
 	}, nil
 }
 
-func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *ecdsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
+func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *rsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
 	certTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
@@ -137,7 +136,7 @@ func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *
 	return x509.CreateCertificate(rand.Reader, certTemplate, certTemplate, &privateKey.PublicKey, privateKey)
 }
 
-func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *ecdsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
+func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *rsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
 	csrMetadata := certs.CSRMetadata{
 		Organization:    []string{p.subject.Organization},
 		Country:         []string{p.subject.Country},
