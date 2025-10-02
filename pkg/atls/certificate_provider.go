@@ -148,12 +148,12 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *rs
 		ExtraExtensions: []pkix.Extension{extension},
 	}
 
-	fmt.Println("Creating CSR with metadata:", csrMetadata)
+	fmt.Println("Creating CSR with metadata:")
 	csr, sdkerr := sdk.CreateCSR(csrMetadata, privateKey)
 	if sdkerr != nil {
 		return nil, fmt.Errorf("failed to create CSR: %w", sdkerr)
 	}
-	fmt.Println("CSR created successfully:", csr)
+	fmt.Println("CSR created successfully:")
 	cert, err := p.certsSDK.IssueFromCSRInternal(p.cvmID, p.ttl.String(), string(csr.CSR), p.agentToken)
 	if err != nil {
 		fmt.Println("Error issuing certificate from CSR:", err)
