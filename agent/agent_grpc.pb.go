@@ -11,8 +11,6 @@ package agent
 
 import (
 	context "context"
-	"fmt"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -56,7 +54,6 @@ func (c *agentServiceClient) Algo(ctx context.Context, opts ...grpc.CallOption) 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &AgentService_ServiceDesc.Streams[0], AgentService_Algo_FullMethodName, cOpts...)
 	if err != nil {
-		fmt.Println("Error creating stream pb.go:", err)
 		return nil, err
 	}
 	x := &grpc.GenericClientStream[AlgoRequest, AlgoResponse]{ClientStream: stream}
