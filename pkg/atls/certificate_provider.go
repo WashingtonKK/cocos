@@ -148,13 +148,15 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *ec
 		ExtraExtensions: []pkix.Extension{extension},
 	}
 
+	fmt.Println("Creating CSR with metadata:", csrMetadata)
 	csr, sdkerr := sdk.CreateCSR(csrMetadata, privateKey)
 	if sdkerr != nil {
 		return nil, fmt.Errorf("failed to create CSR: %w", sdkerr)
 	}
-
+	fmt.Println("CSR created successfully:", csr)
 	cert, err := p.certsSDK.IssueFromCSRInternal(p.cvmID, p.ttl.String(), string(csr.CSR), p.agentToken)
 	if err != nil {
+		fmt.Println("Error issuing certificate from CSR:", err)
 		return nil, err
 	}
 
@@ -175,15 +177,18 @@ func NewProvider(provider attestation.Provider, platformType attestation.Platfor
 	fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	attestationProvider, err := NewAttestationProvider(provider, platformType)
 	if err != nil {
+		fmt.Println("Error creating attestation provider:", err)
 		return nil, fmt.Errorf("failed to create attestation provider: %w", err)
 	}
 
 	subject := DefaultCertificateSubject()
 
+	fmt.Println("Attestation provider created with OID:", attestationProvider.OID())
+	fmt.Println("CertSDK: ", certsSDK)
 	if certsSDK != nil {
-		return NewAttestedCAProvider(attestationProvider, subject, certsSDK, cvmID, agentToken), nil
 		fmt.Println("Creating CA-signed certificate provider")
+		return NewAttestedCAProvider(attestationProvider, subject, certsSDK, cvmID, agentToken), nil
 	}
-
+	fmt.Println("Creating self-signed certificate provider")
 	return NewAttestedProvider(attestationProvider, subject), nil
 }
