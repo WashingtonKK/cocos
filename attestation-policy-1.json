@@ -1,0 +1,28 @@
+{
+  "pcr_values": {
+    "sha1": null,
+    "sha256": null,
+    "sha384": null
+  },
+  "policy": {
+    "chipId": "GrFqtQ+lrkLsjBslu9pcC6XqkrtFWY1ArIQ+I4gugQIsvCG0qekSvEtE4P/SLSJ6mHNpOkY0MHnGpvz1OkV+kw==",
+    "familyId": "AAAAAAAAAAAAAAAAAAAAAA==",
+    "hostData": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    "imageId": "AAAAAAAAAAAAAAAAAAAAAA==",
+    "measurement": "oDYo4e98Da2Fy73nDVZmxiWiz+5gnxae7NMRtdfnwpbBuVYZsI0mynz3fpfe+YIX",
+    "minimumBuild": 29,
+    "minimumVersion": "1.55",
+    "permitProvisionalFirmware": true,
+    "policy": "196608",
+    "product": {
+      "name": "SEV_PRODUCT_MILAN"
+    },
+    "reportIdMa": "//////////////////////////////////////////8=",
+    "vmpl": 2
+  },
+  "rootOfTrust": {
+    "checkCrl": true,
+    "product": "Milan",
+    "productLine": "Milan"
+  }
+}
