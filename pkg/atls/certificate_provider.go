@@ -162,6 +162,7 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *rs
 
 	cleanCertificateString := strings.ReplaceAll(cert.Certificate, "\\n", "\n")
 	block, rest := pem.Decode([]byte(cleanCertificateString))
+	fmt.Println("Certificate issued successfully:  ", cleanCertificateString)
 
 	if len(rest) != 0 {
 		return nil, fmt.Errorf("failed to decode certificate PEM: unexpected remaining data")
