@@ -119,7 +119,6 @@ func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *
 		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
 			Organization:  []string{p.subject.Organization},
-			CommonName:    p.subject.Organization,
 			Country:       []string{p.subject.Country},
 			Province:      []string{p.subject.Province},
 			Locality:      []string{p.subject.Locality},
@@ -141,6 +140,7 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *rs
 	csrMetadata := certs.CSRMetadata{
 		Organization:    []string{p.subject.Organization},
 		Country:         []string{p.subject.Country},
+		CommonName:      p.subject.Organization,
 		Province:        []string{p.subject.Province},
 		Locality:        []string{p.subject.Locality},
 		StreetAddress:   []string{p.subject.StreetAddress},
