@@ -119,6 +119,7 @@ func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *
 		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
 			Organization:  []string{p.subject.Organization},
+			CommonName:    p.subject.Organization,
 			Country:       []string{p.subject.Country},
 			Province:      []string{p.subject.Province},
 			Locality:      []string{p.subject.Locality},

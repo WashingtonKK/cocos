@@ -766,7 +766,7 @@ func TestCASignedCertificateErrors(t *testing.T) {
 			provider := NewAttestedCAProvider(attestationProvider, subject, mockSDK, cvmID, agentToken)
 			attestedProvider := provider.(*attestedCertificateProvider)
 
-			privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+			privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 			require.NoError(t, err)
 
 			extension := pkix.Extension{
