@@ -177,7 +177,8 @@ func main() {
 		var certsSDK sdk.SDK
 		if cfg.CAUrl != "" {
 			certsSDK = sdk.NewSDK(sdk.Config{
-				HostURL: cfg.CAUrl,
+				HostURL:  cfg.CAUrl,
+				CertsURL: cfg.CAUrl,
 			})
 		}
 		logger.Info("Using cert provider for :")
