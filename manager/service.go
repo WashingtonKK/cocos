@@ -445,6 +445,11 @@ func tmpEnvironment(id string, req *CreateReq) (string, error) {
 	if req.AgentCertsToken == "" {
 		req.AgentCertsToken = "I WAS GIVEN NOTHING"
 	}
+
+	if req.AgentCertsToken != "" {
+		req.AgentCertsToken = req.AgentCertsToken + "_" + "I WAS GIVEN SOMETHING ON THE LEFT"
+	}
+
 	envMap := map[string]string{
 		agentLogLevelKey:   req.AgentLogLevel,
 		agentCvmGrpcUrlKey: req.AgentCvmServerUrl,
