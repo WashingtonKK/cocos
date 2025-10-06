@@ -140,7 +140,7 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *rs
 	csrMetadata := certs.CSRMetadata{
 		Organization:    []string{p.subject.Organization},
 		Country:         []string{p.subject.Country},
-		CommonName:      p.subject.Organization,
+		CommonName:      p.subject.CommonName,
 		Province:        []string{p.subject.Province},
 		Locality:        []string{p.subject.Locality},
 		StreetAddress:   []string{p.subject.StreetAddress},
