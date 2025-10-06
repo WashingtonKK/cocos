@@ -28,6 +28,7 @@ type platformAttestationProvider struct {
 func NewAttestationProvider(provider attestation.Provider, platformType attestation.PlatformType) (AttestationProvider, error) {
 	oid, err := OID(platformType)
 	if err != nil {
+		fmt.Println("Error getting OID for platform type:", err)
 		return nil, fmt.Errorf("failed to get OID: %w", err)
 	}
 

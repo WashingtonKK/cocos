@@ -3,9 +3,8 @@
 package atls
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -73,7 +72,7 @@ func (p *attestedCertificateProvider) SetTTL(ttl time.Duration) {
 }
 
 func (p *attestedCertificateProvider) GetCertificate(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate private key: %w", err)
 	}
@@ -115,7 +114,7 @@ func (p *attestedCertificateProvider) GetCertificate(clientHello *tls.ClientHell
 	}, nil
 }
 
-func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *ecdsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
+func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *rsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
 	certTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().Unix()),
 		Subject: pkix.Name{
@@ -137,7 +136,7 @@ func (p *attestedCertificateProvider) generateSelfSignedCertificate(privateKey *
 	return x509.CreateCertificate(rand.Reader, certTemplate, certTemplate, &privateKey.PublicKey, privateKey)
 }
 
-func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *ecdsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
+func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *rsa.PrivateKey, extension pkix.Extension) ([]byte, error) {
 	csrMetadata := certs.CSRMetadata{
 		Organization:    []string{p.subject.Organization},
 		Country:         []string{p.subject.Country},
@@ -149,18 +148,21 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *ec
 		ExtraExtensions: []pkix.Extension{extension},
 	}
 
+	fmt.Println("Creating CSR with metadata:   ")
 	csr, sdkerr := sdk.CreateCSR(csrMetadata, privateKey)
 	if sdkerr != nil {
 		return nil, fmt.Errorf("failed to create CSR: %w", sdkerr)
 	}
-
+	fmt.Println("CSR created successfully: ", strings.ReplaceAll(string(csr.CSR), "\\n", "\n"))
 	cert, err := p.certsSDK.IssueFromCSRInternal(p.cvmID, p.ttl.String(), string(csr.CSR), p.agentToken)
 	if err != nil {
+		fmt.Println("Error issuing certificate from CSR:", err)
 		return nil, err
 	}
 
 	cleanCertificateString := strings.ReplaceAll(cert.Certificate, "\\n", "\n")
 	block, rest := pem.Decode([]byte(cleanCertificateString))
+	fmt.Println("Certificate issued successfully:  ", cleanCertificateString)
 
 	if len(rest) != 0 {
 		return nil, fmt.Errorf("failed to decode certificate PEM: unexpected remaining data")
@@ -173,16 +175,21 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *ec
 }
 
 func NewProvider(provider attestation.Provider, platformType attestation.PlatformType, agentToken, cvmID string, certsSDK sdk.SDK) (CertificateProvider, error) {
+	fmt.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	attestationProvider, err := NewAttestationProvider(provider, platformType)
 	if err != nil {
+		fmt.Println("Error creating attestation provider:", err)
 		return nil, fmt.Errorf("failed to create attestation provider: %w", err)
 	}
 
 	subject := DefaultCertificateSubject()
 
+	fmt.Println("Attestation provider created with OID:", attestationProvider.OID())
+	fmt.Println("CertSDK: ", certsSDK)
 	if certsSDK != nil {
+		fmt.Println("Creating CA-signed certificate provider")
 		return NewAttestedCAProvider(attestationProvider, subject, certsSDK, cvmID, agentToken), nil
 	}
-
+	fmt.Println("Creating self-signed certificate provider")
 	return NewAttestedProvider(attestationProvider, subject), nil
 }
