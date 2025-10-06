@@ -442,6 +442,8 @@ func tmpEnvironment(id string, req *CreateReq) (string, error) {
 		return "", err
 	}
 
+	req.AgentCvmCaUrl = "I WAS GIVEN SOMETHING _ CA URL - " + req.AgentCertsToken
+
 	if req.AgentCertsToken == "" {
 		req.AgentCertsToken = "I WAS GIVEN NOTHING"
 		req.AgentCvmCaUrl = "I WAS GIVEN NOTHING _ CA URL"
