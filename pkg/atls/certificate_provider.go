@@ -149,7 +149,7 @@ func (p *attestedCertificateProvider) generateCASignedCertificate(privateKey *rs
 	}
 
 	fmt.Println("Creating CSR with metadata:   ")
-	csr, sdkerr := sdk.CreateCSR(csrMetadata, privateKey)
+	csr, sdkerr := p.certsSDK.CreateCSR(csrMetadata, privateKey)
 	if sdkerr != nil {
 		return nil, fmt.Errorf("failed to create CSR: %w", sdkerr)
 	}
