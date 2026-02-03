@@ -213,7 +213,15 @@ func VTPMVerify(quote []byte, teeNonce []byte, vtpmNonce []byte, writer io.Write
 		return errors.Wrap(fmt.Errorf("failed to unmarshal quote"), err)
 	}
 
-	if err := quoteprovider.VerifyAttestationReportTLS(attestation.GetSevSnpAttestation(), teeNonce, policy); err != nil {
+	akPub := attestation.GetAkPub()
+
+	nonce := make([]byte, 0, len(teeNonce)+len(akPub))
+	nonce = append(nonce, teeNonce...)
+	nonce = append(nonce, akPub...)
+
+	attestData := sha3.Sum512(nonce)
+
+	if err := quoteprovider.VerifyAttestationReportTLS(attestation.GetSevSnpAttestation(), attestData[:], policy); err != nil {
 		return fmt.Errorf("failed to verify TEE attestation report: %v", err)
 	}
 
@@ -239,7 +247,9 @@ func VerifyQuote(quote []byte, vtpmNonce []byte, writer io.Writer, policy *attes
 		return err
 	}
 
-	ms, err := server.VerifyAttestation(attestation, server.VerifyOpts{Nonce: vtpmNonce, TrustedAKs: []crypto.PublicKey{cryptoPub}})
+	verifyOpts := server.VerifyOpts{Nonce: vtpmNonce, TrustedAKs: []crypto.PublicKey{cryptoPub}, AllowEFIAppBeforeCallingEvent: true}
+
+	ms, err := server.VerifyAttestation(attestation, verifyOpts)
 	if err != nil {
 		return errors.Wrap(fmt.Errorf("failed to verify attestation"), err)
 	}
@@ -305,7 +315,15 @@ func FetchQuote(nonce []byte) (*attest.Attestation, error) {
 }
 
 func addTEEAttestation(attestation *attest.Attestation, nonce []byte, vmpl uint) error {
-	rawTeeAttestation, err := quoteprovider.FetchAttestation(nonce, vmpl)
+	akPub := attestation.GetAkPub()
+
+	teeNonce := make([]byte, 0, len(nonce)+len(akPub))
+	teeNonce = append(teeNonce, nonce...)
+	teeNonce = append(teeNonce, akPub...)
+
+	attestData := sha3.Sum512(teeNonce)
+
+	rawTeeAttestation, err := quoteprovider.FetchAttestation(attestData[:], vmpl)
 	if err != nil {
 		return fmt.Errorf("failed to fetch TEE attestation report: %v", err)
 	}
